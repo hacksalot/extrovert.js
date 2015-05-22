@@ -1,0 +1,88 @@
+# This .gitattributes file is the merged output of two boilerplate .gitattributes files:
+#
+#    - https://github.com/Danimoth/gitattributes/blob/master/Common.gitattributes
+#    - https://github.com/Danimoth/gitattributes/blob/master/Web.gitattributes
+#
+# It's appropriate as a starting point for most web-based projects.
+
+##
+#
+# COMMON SETTINGS
+# See: https://github.com/Danimoth/gitattributes/blob/master/Common.gitattributes
+#
+##
+
+# Auto detect text files and perform LF normalization
+# http://davidlaing.com/2012/09/19/customise-your-gitattributes-to-become-a-git-ninja/
+
+* text=auto
+
+#
+# The above will handle all files NOT found below
+#
+
+# Documents
+*.doc  diff=astextplain
+*.DOC  diff=astextplain
+*.docx diff=astextplain
+*.DOCX diff=astextplain
+*.dot  diff=astextplain
+*.DOT  diff=astextplain
+*.pdf  diff=astextplain
+*.PDF  diff=astextplain
+*.rtf  diff=astextplain
+*.RTF  diff=astextplain
+*.md text
+*.adoc text
+*.textile text
+*.mustache text
+*.csv text
+*.tab text
+*.tsv text
+*.sql text
+
+# Graphics
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.svg text
+
+##
+#
+# WEB SETTINGS
+# See: https://github.com/Danimoth/gitattributes/blob/master/Web.gitattributes
+#
+##
+
+# These files are text and should be normalized (Convert crlf => lf)
+*.php text
+*.css text
+*.js text
+*.json text
+*.htm text
+*.html text
+*.xml text
+*.txt text
+*.ini text
+*.inc text
+*.pl text
+*.rb text
+*.py text
+*.scm text
+.htaccess text
+
+# These files are binary and should be left untouched
+# (binary is a macro for -text -diff)
+*.mov binary
+*.mp4 binary
+*.mp3 binary
+*.flv binary
+*.fla binary
+*.swf binary
+*.gz binary
+*.zip binary
+*.7z binary
+*.ttf binary
+*.pyc binary

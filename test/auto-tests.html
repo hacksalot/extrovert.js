@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Extrovert3D - Automated Smoke Tests</title>
+  <link rel="stylesheet" href="//code.jquery.com/qunit/qunit-1.17.1.css">
+  <script src="//code.jquery.com/qunit/qunit-1.17.1.js"></script>
+  <script src="../bower_components/threejs/build/three.min.js"></script>
+  <script src="../bower_components/physijs/physi.js"></script>
+  <script src="../dist/extrovert.js"></script>
+  <style>
+    img {
+      width: 20%;
+      margin-left: 4%;
+    }
+    #source, #target {
+      position: absolute;
+      left: 0; top: 0;
+    }
+  </style>
+</head>
+<body>
+  <div id="qunit"></div>
+  <div id="qunit-fixture"></div>
+  <script>
+    QUnit.test( "Verify custom version of extend().", function( assert ) {
+
+      var user_opts = {
+        propa: 'a',
+        generator: {
+          name: 'gallery'
+        },
+        sub: {
+          sub_a: {
+            val: 'foo'
+          }
+        }
+      };
+      var def_opts = {
+        propb: 'b',
+        generator: {
+          name: 'wall'
+        },
+        sub: {
+          val: 'bar'
+        }
+      };
+
+      var combined = extro.Utils.extend(true, {}, def_opts, user_opts);
+      assert.strictEqual( combined.generator.name, 'gallery' );
+      assert.strictEqual( combined.propa, 'a' );
+      assert.strictEqual( combined.propb, 'b' );
+      assert.strictEqual( combined.sub.val, 'bar' );
+      assert.strictEqual( combined.sub.sub_a.val, 'foo' );
+    });
+    
+    QUnit.test( "Verify custom version of extend().", function( assert ) {
+    
+    
+
+
+    });    
+
+
+  </script>
+
+  <div style="position: relative;">
+  <div id="source">
+    <img src="img/ace_of_spades.png">
+    <img src="img/ace_of_hearts.png">
+    <img src="img/ace_of_diamonds.png">
+    <img src="img/ace_of_clubs.png">
+  </div>
+  <div id="target">
+  </div>
+  </div>
+</body>
+</html>

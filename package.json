@@ -1,0 +1,35 @@
+{
+  "name": "extrovert.js",
+  "version": "0.1.0",
+  "author": "James Devlin",
+  "description": "3Dify your websites, blogs, RSS feeds, and image galleries.",
+  "main": "Gruntfile.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/indevious/extrovert.js.git"
+  },
+  "devDependencies": {
+    "grunt": "^0.4.5",
+    "grunt-contrib-clean": "^0.6.0",
+    "grunt-contrib-compress": "^0.13.0",
+    "grunt-contrib-concat": "^0.5.1",
+    "grunt-contrib-connect": "^0.9.0",
+    "grunt-contrib-copy": "^0.8.0",
+    "grunt-contrib-jshint": "^0.11.0",
+    "grunt-contrib-qunit": "^0.5.2",
+    "grunt-contrib-requirejs": "^0.4.4",
+    "grunt-contrib-uglify": "^0.8.0"
+  },
+  "keywords": [
+    "extrovert",
+    "webgl",
+    "3D",
+    "three.js",
+    "physijs"
+  ],
+  "license": "MIT",
+  "homepage": "http://extrovert3d.com",
+  "bugs": {
+    "url": "https://github.com/indevious/extrovert.js/issues"
+  }
+}

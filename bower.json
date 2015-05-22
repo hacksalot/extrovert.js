@@ -1,0 +1,42 @@
+{
+  "name": "extrovert.js",
+  "authors": [
+    "James Devlin <james@indevious.com>"
+  ],
+  "description": "3Dify your websites, blogs, RSS feeds, and image galleries.",
+  "main": [
+    "dist/extrovert.js"
+  ],
+  "dependencies": {
+    "threejs": "*",
+    "physijs": "*",
+    "in.scribe": "~0.1.0",
+    "almond": "~0.3.1"
+  },
+  "ignore": [
+    "bower_components/",
+    "node_modules/",
+    "src/",
+    "MANIFEST.xml",
+    "README.md",
+    ".git/",
+    ".gitignore",
+    ".gitattributes",
+    ".jshintignore",
+    ".jshintrc",
+    "Gruntfile.js"
+  ],
+  "keywords": [
+    "extrovert",
+    "webgl",
+    "3D",
+    "three.js",
+    "physijs"
+  ],
+  "license": "MIT",
+  "homepage": "http://extrovert3d.com",
+  "private": true,
+  "resolutions": {
+    "threejs": "d49bb0e85f"
+  }
+}

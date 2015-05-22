@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Extrovert3D - Smoke Tests</title>
+  <link rel="stylesheet" href="//code.jquery.com/qunit/qunit-1.17.1.css">
+  <script src="//code.jquery.com/qunit/qunit-1.17.1.js"></script>
+  <script src="../bower_components/threejs/build/three.min.js"></script>
+  <script src="../bower_components/physijs/physi.js"></script>
+  <script src="../dist/extrovert.js"></script>
+  <style>
+    img {
+      width: 20%;
+      margin-left: 4%;
+    }
+    #source, #target {
+      position: absolute;
+      left: 0; top: 0;
+    }
+  </style>
+</head>
+<body>
+  <div id="qunit"></div>
+  <div id="qunit-fixture"></div>
+  <script>
+    var opts = {
+      target: { container: '#target' },
+      objects: [{ type: 'extrude', src: 'img', container: '#source' }]
+      bkcolor: 0xFFAA00
+    };
+
+    QUnit.test( "Verify WebGL support.", function( assert ) {
+      assert.ok( EXTROVERT.Utils.detect_webgl() );
+    });
+
+    QUnit.test( "Initialize the Extrovert library.", function( assert ) {
+      var ret = EXTROVERT.init( opts );
+      assert.ok( ret );
+    });
+
+    QUnit.test( "Verify canvas.", function( assert ) {
+      var elems = document.getElementsByTagName('canvas');
+      assert.strictEqual( elems.length, 1 );
+    });
+
+  </script>
+
+  <div style="position: relative;">
+  <div id="source">
+    <img src="img/ace_of_spades.png">
+    <img src="img/ace_of_hearts.png">
+    <img src="img/ace_of_diamonds.png">
+    <img src="img/ace_of_clubs.png">
+  </div>
+  <div id="target">
+  </div>
+  </div>
+</body>
+</html>
