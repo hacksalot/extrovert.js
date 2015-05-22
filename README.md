@@ -2,10 +2,10 @@
 
 **Extrovert.js transforms your data into textured 3D geometry**. It supports physics, animations, cross-browser rendering, mouse and keyboard controls, and a five-minute install. It's intended for 3Dification of anything from on-page HTML to JSON responses fetched over AJAX to custom data formats specific to you or your project. [Visit the official project website](http://extrovert3d.com).
 
-![](../gh-pages/extrovert_famous_photos.jpg)
-![](../gh-pages/extrovert_art_of_war.jpg)
-![](../gh-pages/extrovert_xkcdown.jpg)
-![](../gh-pages/extrovert_cards.jpg)
+![](../indoc/img/extrovert_famous_photos.jpg)
+![](../indoc/img/extrovert_art_of_war.jpg)
+![](../indoc/img/extrovert_xkcdown.jpg)
+![](../indoc/img/extrovert_cards.jpg)
 
 ## License ##
 
