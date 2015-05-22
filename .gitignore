@@ -1,7 +1,7 @@
 # Exclude content-related folders and files
-dist/
 node_modules/
 bower_components/
-TODO.md
 .tmp/
-
+TODO.md
+dist/ammo.js
+dist/physi*.js
