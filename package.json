@@ -1,6 +1,6 @@
 {
   "name": "extrovert.js",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "author": "James Devlin",
   "description": "3Dify your websites, blogs, RSS feeds, and image galleries.",
   "main": "Gruntfile.js",

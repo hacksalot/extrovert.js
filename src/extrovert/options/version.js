@@ -7,6 +7,6 @@ Default Extrovert options.
 define({
   major: 0,
   minor: 1,
-  patch: 0,
-  str: "0.1.0"
+  patch: 2,
+  str: "0.1.2"
 });

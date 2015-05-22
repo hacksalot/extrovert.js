@@ -17,7 +17,7 @@ module.exports = function(grunt) {
     },
 
     requirejs: {
-      annotated: {
+      main: {
         options: {
           out: 'dist/extrovert.js',
           baseUrl: 'src',

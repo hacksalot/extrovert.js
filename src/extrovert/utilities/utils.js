@@ -7,6 +7,7 @@ Utilities for Extrovert.js.
 define(['require', 'three', './cookie', './getComputedStyle'],
 function( require, THREE, cookie, getComputedStyle )  {
 
+  var events;
   'use strict';
   return {
     VZERO: new THREE.Vector3(0, 0, 0),
@@ -17,14 +18,14 @@ function( require, THREE, cookie, getComputedStyle )  {
     getComputedStyle: getComputedStyle,
     // https://developer.mozilla.org/en-US/docs/Web/Guide/Events/Creating_and_triggering_events
     registerEvent: function( eventName ) {
-      var classic = true, // older IE-compat method
-      my.events = my.events || { },
-      my.events[ eventName ] = classic ? document.createEvent( 'Event' ) : new Event( eventName ),
-      classic && my.events[ eventName ].initEvent( eventName, true, true ),
-      return my.events[ eventName ];
+      var classic = true; // older IE-compat method
+      events = events || { };
+      events[ eventName ] = classic ? document.createEvent( 'Event' ) : new Event( eventName );
+      classic && events[ eventName ].initEvent( eventName, true, true );
+      return events[ eventName ];
     },
     fireEvent: function( eventName ) {
-      document.dispatchEvent( my.events[ eventName ] );
+      document.dispatchEvent( events[ eventName ] );
     }
   };
 
