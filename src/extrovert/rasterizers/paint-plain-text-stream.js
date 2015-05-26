@@ -13,7 +13,7 @@ define(['extrovert/utilities/utils', 'extrovert/providers/three/provider-three',
       var textures = [];
       var wrapInfo = { };
       var lineHeight = opts.lineHeight || 16;
-      var massaged_content = val.text.replace('\n',' ');
+      var massaged_content = val.text;
       var padding = opts.padding || 10;
       info.numLines = 0;
       var canvas = document.createElement('canvas');
