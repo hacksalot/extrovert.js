@@ -13,13 +13,13 @@ define(['require', '../core', '../utilities/log', 'extrovert/providers/three/pro
   var _side = null;
   var _noun = null;
 
-  function mapTextures( cubeGeo ) {
+  function mapTextures( cubeGeo, width, height ) {
     for (var i = 0; i < cubeGeo.faces.length ; i++) {
       var fvu = cubeGeo.faceVertexUvs[0][i];
       if( Math.abs( cubeGeo.faces[ i ].normal.z ) > 0.9) {
         for( var fv = 0; fv < 3; fv++ ) {
           if( Math.abs( fvu[fv].y ) < 0.01 ) {
-            fvu[ fv ].y = 0.37;
+            fvu[ fv ].y = 1 - ( width / height );
           }
         }
       }
@@ -101,7 +101,7 @@ define(['require', '../core', '../utilities/log', 'extrovert/providers/three/pro
               var matArray = [ _side, _side, _side, _side, front[ tt ], tt < back.length ? back[ tt ] : _side ];
               var meshMat = provider.createCubeMaterial( matArray );
               var mesh = extrovert.createObject({ type: 'box', pos: tilePos, dims: _opts.dims, mat: meshMat, mass: 1000 });
-              mapTextures( mesh.geometry );
+              mapTextures( mesh.geometry, rastOpts.width, rastOpts.height );
               extrovert.LOGGING && log.msg('Generating page %o at position %f, %f, %f', mesh, tilePos[0], tilePos[1], tilePos[2]);
             }
           }
