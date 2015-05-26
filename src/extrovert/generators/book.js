@@ -7,7 +7,7 @@ The built-in "book" generator for Extrovert.js.
 define(['require', '../core', '../utilities/log', 'extrovert/providers/three/provider-three'], function( require, extro, log, provider ) {
 
   'use strict';
-  
+
   var _opts = null;
   var _eng = null;
   var _side = null;
@@ -28,8 +28,8 @@ define(['require', '../core', '../utilities/log', 'extrovert/providers/three/pro
   }
 
   var BookGenerator = function( ) {
-    
-    var extrovert = require('../core');   
+
+    var extrovert = require('../core');
     var utils = require('../utilities/utils');
 
     return {
@@ -77,20 +77,18 @@ define(['require', '../core', '../utilities/log', 'extrovert/providers/three/pro
               _eng.rasterizers[ noun.rasterizer ] : noun.rasterizer;
           } else {
             rast = _eng.rasterizers.paint_plain_text_stream;
-            //rast = extrovert.getRasterizer( obj );
           }
 
           if( _opts.pagify ) {
             var done = false,
               info = { },
               rastOpts = {
-                width: _opts.texWidth || 512, // Force power-of-2 textures
+                width: _opts.texWidth || 512, // Default to power-of-2 textures
                 height: _opts.texHeight || 1024,
                 bkColor: _opts.pageColor || (_opts.material && _opts.material.color) || 0xFFFFFF,
                 textColor: _opts.textColor || 0x232323
               },
               textures = rast.paint(obj, rastOpts, info );
-              //matArray = [ _side, _side, _side, _side, null, null ];
 
             var mats = textures.map( _createMat );
             var front = mats.filter( _isEven );
@@ -110,6 +108,6 @@ define(['require', '../core', '../utilities/log', 'extrovert/providers/three/pro
 
     };
   };
-  
+
   return BookGenerator;
 });
