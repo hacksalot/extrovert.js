@@ -4,8 +4,8 @@ Utilities for Extrovert.js.
 @license Copyright (c) 2015 | James M. Devlin
 */
 
-define(['require', 'three', './cookie', './getComputedStyle', 'in.scribe'],
-function( require, THREE, cookie, getComputedStyle, inscribe )  {
+define(['require', 'three', './cookie', './getComputedStyle', './detect',  'in.scribe'],
+function( require, THREE, cookie, getComputedStyle, detect, inscribe )  {
 
   var events;
   'use strict';
@@ -17,6 +17,8 @@ function( require, THREE, cookie, getComputedStyle, inscribe )  {
     clearCookie: cookie.clearCookie,
     getComputedStyle: getComputedStyle,
     wrapText: (new inscribe()).wrapText,
+    detectWebGL: detect.supportsWebGL,
+    detectCanvas: detect.supportsCanvas,
     // https://developer.mozilla.org/en-US/docs/Web/Guide/Events/Creating_and_triggering_events
     registerEvent: function( eventName ) {
       var classic = true; // older IE-compat method
