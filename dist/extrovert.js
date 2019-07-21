@@ -3,7 +3,7 @@
 * Extrovert.js 0.1.0
 * ----------------------------------------------------------------------------
 * @license Copyright (c) 2015 James M. Devlin | All Rights Reserved.
-* See: https://extrovert3d.com/license for details.
+* See: http://extrovert3d.com/license for details.
 *
 *
 * Extrovert.js incorporates the following libraries:
@@ -820,7 +820,7 @@ Rasterize formatted text, markup, and HTML content.
     , measureOnly = false // future
     , lines = text.split('\n')
     , lineIdx = 0;
-
+    
     // Process hard lines
     lines.reduce(function( unused, line, hardIdx ) {
 
@@ -1121,7 +1121,7 @@ define('extrovert/providers/three/provider-three',['extrovert/options/options', 
   @method fiatLux
   @param light_opts A valid object representing a light.
   */
-  my.fiatLux = function( light_opts ) {
+  my.fiatLux = function( light_opts, eng ) {
 
     if( !light_opts || light_opts.length === 0 )
       return;
@@ -1676,7 +1676,6 @@ function( require, extro, provider )
             if( el_floor > floor )
               floor = el_floor;
           }
-          console.log('Floor is ' + floor);
         }
 
         for( var j = 0; j < elems.length; j++ ) {
@@ -2182,7 +2181,7 @@ function
       my.LOGGING && log.msg('Camera moved to [%f,%f,%f]: %o', oc.position[0], oc.position[1], oc.position[2], cam);
     }
 
-    provider.fiatLux( opts.lights ).forEach(function(val) {
+    provider.fiatLux( opts.lights, eng ).forEach(function(val) {
       eng.scene.add(val);
     });
   }
@@ -2662,7 +2661,7 @@ define('extrovert',['require','extrovert/options/version','extrovert/core','extr
     define('three', function () {
         return THREE;
     });
-
+    
     define('physijs', function() {
       return Physijs;
     });

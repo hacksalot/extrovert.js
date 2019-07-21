@@ -138,7 +138,7 @@ define(['extrovert/options/options', 'three', 'physijs'], function( options, THR
   @method fiatLux
   @param light_opts A valid object representing a light.
   */
-  my.fiatLux = function( light_opts ) {
+  my.fiatLux = function( light_opts, eng ) {
 
     if( !light_opts || light_opts.length === 0 )
       return;
@@ -170,7 +170,7 @@ define(['extrovert/options/options', 'three', 'physijs'], function( options, THR
 
     return lights;
   };
-  
+
   /**
   Create a spotlight with the specified color. TODO: adjust shadowmap settings.
   @method createSpotlight
@@ -182,7 +182,7 @@ define(['extrovert/options/options', 'three', 'physijs'], function( options, THR
     var spotLight = new THREE.SpotLight( light.color );
     spotLight.shadowCameraVisible = false;
     return spotLight;
-  }  
+  }
 
   /**
   Module return.

@@ -261,7 +261,7 @@ function
       my.LOGGING && log.msg('Camera moved to [%f,%f,%f]: %o', oc.position[0], oc.position[1], oc.position[2], cam);
     }
 
-    provider.fiatLux( opts.lights ).forEach(function(val) {
+    provider.fiatLux( opts.lights, eng ).forEach(function(val) {
       eng.scene.add(val);
     });
   }
