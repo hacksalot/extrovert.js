@@ -38,13 +38,11 @@
   }
 }(this, function ( THREE, Physijs ) {
 /**
- * @license almond 0.3.1 Copyright (c) 2011-2014, The Dojo Foundation All Rights Reserved.
- * Available via the MIT or new BSD license.
- * see: http://github.com/jrburke/almond for details
+ * @license almond 0.3.3 Copyright jQuery Foundation and other contributors.
+ * Released under MIT license, http://github.com/requirejs/almond/LICENSE
  */
 //Going sloppy to avoid 'use strict' string cost, but strict practices should
 //be followed.
-/*jslint sloppy: true */
 /*global setTimeout: false */
 
 var requirejs, require, define;
@@ -72,60 +70,58 @@ var requirejs, require, define;
      */
     function normalize(name, baseName) {
         var nameParts, nameSegment, mapValue, foundMap, lastIndex,
-            foundI, foundStarMap, starI, i, j, part,
+            foundI, foundStarMap, starI, i, j, part, normalizedBaseParts,
             baseParts = baseName && baseName.split("/"),
             map = config.map,
             starMap = (map && map['*']) || {};
 
         //Adjust any relative paths.
-        if (name && name.charAt(0) === ".") {
-            //If have a base name, try to normalize against it,
-            //otherwise, assume it is a top-level require that will
-            //be relative to baseUrl in the end.
-            if (baseName) {
-                name = name.split('/');
-                lastIndex = name.length - 1;
+        if (name) {
+            name = name.split('/');
+            lastIndex = name.length - 1;
 
-                // Node .js allowance:
-                if (config.nodeIdCompat && jsSuffixRegExp.test(name[lastIndex])) {
-                    name[lastIndex] = name[lastIndex].replace(jsSuffixRegExp, '');
-                }
+            // If wanting node ID compatibility, strip .js from end
+            // of IDs. Have to do this here, and not in nameToUrl
+            // because node allows either .js or non .js to map
+            // to same file.
+            if (config.nodeIdCompat && jsSuffixRegExp.test(name[lastIndex])) {
+                name[lastIndex] = name[lastIndex].replace(jsSuffixRegExp, '');
+            }
 
-                //Lop off the last part of baseParts, so that . matches the
-                //"directory" and not name of the baseName's module. For instance,
-                //baseName of "one/two/three", maps to "one/two/three.js", but we
-                //want the directory, "one/two" for this normalization.
-                name = baseParts.slice(0, baseParts.length - 1).concat(name);
+            // Starts with a '.' so need the baseName
+            if (name[0].charAt(0) === '.' && baseParts) {
+                //Convert baseName to array, and lop off the last part,
+                //so that . matches that 'directory' and not name of the baseName's
+                //module. For instance, baseName of 'one/two/three', maps to
+                //'one/two/three.js', but we want the directory, 'one/two' for
+                //this normalization.
+                normalizedBaseParts = baseParts.slice(0, baseParts.length - 1);
+                name = normalizedBaseParts.concat(name);
+            }
 
-                //start trimDots
-                for (i = 0; i < name.length; i += 1) {
-                    part = name[i];
-                    if (part === ".") {
-                        name.splice(i, 1);
-                        i -= 1;
-                    } else if (part === "..") {
-                        if (i === 1 && (name[2] === '..' || name[0] === '..')) {
-                            //End of the line. Keep at least one non-dot
-                            //path segment at the front so it can be mapped
-                            //correctly to disk. Otherwise, there is likely
-                            //no path mapping for a path starting with '..'.
-                            //This can still fail, but catches the most reasonable
-                            //uses of ..
-                            break;
-                        } else if (i > 0) {
-                            name.splice(i - 1, 2);
-                            i -= 2;
-                        }
+            //start trimDots
+            for (i = 0; i < name.length; i++) {
+                part = name[i];
+                if (part === '.') {
+                    name.splice(i, 1);
+                    i -= 1;
+                } else if (part === '..') {
+                    // If at the start, or previous value is still ..,
+                    // keep them so that when converted to a path it may
+                    // still work when converted to a path, even though
+                    // as an ID it is less than ideal. In larger point
+                    // releases, may be better to just kick out an error.
+                    if (i === 0 || (i === 1 && name[2] === '..') || name[i - 1] === '..') {
+                        continue;
+                    } else if (i > 0) {
+                        name.splice(i - 1, 2);
+                        i -= 2;
                     }
                 }
-                //end trimDots
-
-                name = name.join("/");
-            } else if (name.indexOf('./') === 0) {
-                // No baseName, so this is ID is resolved relative
-                // to baseUrl, pull off the leading dot.
-                name = name.substring(2);
             }
+            //end trimDots
+
+            name = name.join('/');
         }
 
         //Apply map config if available.
@@ -238,32 +234,39 @@ var requirejs, require, define;
         return [prefix, name];
     }
 
+    //Creates a parts array for a relName where first part is plugin ID,
+    //second part is resource ID. Assumes relName has already been normalized.
+    function makeRelParts(relName) {
+        return relName ? splitPrefix(relName) : [];
+    }
+
     /**
      * Makes a name map, normalizing the name, and using a plugin
      * for normalization if necessary. Grabs a ref to plugin
      * too, as an optimization.
      */
-    makeMap = function (name, relName) {
+    makeMap = function (name, relParts) {
         var plugin,
             parts = splitPrefix(name),
-            prefix = parts[0];
+            prefix = parts[0],
+            relResourceName = relParts[1];
 
         name = parts[1];
 
         if (prefix) {
-            prefix = normalize(prefix, relName);
+            prefix = normalize(prefix, relResourceName);
             plugin = callDep(prefix);
         }
 
         //Normalize according
         if (prefix) {
             if (plugin && plugin.normalize) {
-                name = plugin.normalize(name, makeNormalize(relName));
+                name = plugin.normalize(name, makeNormalize(relResourceName));
             } else {
-                name = normalize(name, relName);
+                name = normalize(name, relResourceName);
             }
         } else {
-            name = normalize(name, relName);
+            name = normalize(name, relResourceName);
             parts = splitPrefix(name);
             prefix = parts[0];
             name = parts[1];
@@ -310,13 +313,14 @@ var requirejs, require, define;
     };
 
     main = function (name, deps, callback, relName) {
-        var cjsModule, depName, ret, map, i,
+        var cjsModule, depName, ret, map, i, relParts,
             args = [],
             callbackType = typeof callback,
             usingExports;
 
         //Use name if no relName
         relName = relName || name;
+        relParts = makeRelParts(relName);
 
         //Call the callback to define the module, if necessary.
         if (callbackType === 'undefined' || callbackType === 'function') {
@@ -325,7 +329,7 @@ var requirejs, require, define;
             //Default to [require, exports, module] if no deps
             deps = !deps.length && callback.length ? ['require', 'exports', 'module'] : deps;
             for (i = 0; i < deps.length; i += 1) {
-                map = makeMap(deps[i], relName);
+                map = makeMap(deps[i], relParts);
                 depName = map.f;
 
                 //Fast path CommonJS standard dependencies.
@@ -381,7 +385,7 @@ var requirejs, require, define;
             //deps arg is the module name, and second arg (if passed)
             //is just the relName.
             //Normalize module name, if it contains . or ..
-            return callDep(makeMap(deps, callback).f);
+            return callDep(makeMap(deps, makeRelParts(callback)).f);
         } else if (!deps.splice) {
             //deps is a config object, not an array.
             config = deps;
@@ -717,13 +721,165 @@ define( 'extrovert/utilities/getComputedStyle',[],function() {
   };
 });
 /**
+WebGL and Canvas detection routines.
+@module core.js
+@license Copyright (c) 2015 | James M. Devlin
+*/
+
+define('extrovert/utilities/detect',[],function() {
+
+  return {
+
+    /**
+    Figure out if the browser supports WebGL.
+    @method detectWebGL
+    */
+    supportsWebGL: function( return_context ) {
+      if( !!window.WebGLRenderingContext ) {
+        var canvas = document.createElement("canvas");
+        var names = ["webgl", "experimental-webgl", "moz-webgl", "webkit-3d"];
+        var context = false;
+        for(var i=0;i<4;i++) {
+          try {
+            context = canvas.getContext(names[i]);
+            if (context && typeof context.getParameter == "function") {
+              // WebGL is enabled
+              if (return_context) {
+                // return WebGL object if the function's argument is present
+                return {name:names[i], gl:context};
+              }
+              // else, return just true
+              return true;
+            }
+          } catch(e) {
+          }
+        }
+
+        // WebGL is supported, but disabled
+        return false;
+      }
+
+      // WebGL not supported
+      return false;
+    },
+
+    /**
+    Figure out if the browser supports Canvas.
+    http://stackoverflow.com/q/2745432
+    @method detectVCanvas
+    */
+    supportsCanvas: function() {
+      var elem = document.createElement('canvas');
+      return !!(elem.getContext && elem.getContext('2d'));
+    }
+
+  };
+
+});
+/**
+Rasterize formatted text, markup, and HTML content.
+@version 0.1.0
+@file in.scribe.js
+@author James Devlin (james@indevious.com)
+@license MIT
+*/
+
+( function( window, factory ) {
+
+  // UMD trickery - https://github.com/umdjs/umd
+  'use strict';
+  if ( typeof define === 'function' && define.amd ) {
+    define( 'in.scribe',[], factory ); // AMD
+  } else if ( typeof exports === 'object' ) {
+    module.exports = factory( ); // CommonJS
+  } else {
+    window.inscribe = factory( ); // browser global
+  }
+
+}( window, function factory( ) {
+
+  'use strict';
+
+  var my = function( ) {
+
+    return {
+      inscribe: function( text, ctype, ctx, opts ) {
+        my[ '_render' + (ctype || 'text') ].call( this, ctx, text, opts );
+      }
+    };
+
+  };
+
+  my._rendertext = function( context, text, opts ) {
+
+    // Lift vars and apply defaults
+    var padding = opts.padding || 10
+    , maxWidth = opts.maxWidth ? opts.maxWidth - (2 * padding) : 492
+    , lineHeight = opts.lineHeight || 16
+    , pos = [padding, padding + lineHeight]
+    , measureOnly = false // future
+    , lines = text.split('\n')
+    , lineIdx = 0;
+    
+    // Process hard lines
+    lines.reduce(function( unused, line, hardIdx ) {
+
+      var words = line.split(' '), safeLine = '';
+      words[0] = (opts.firstLineIndent || '   ') + words[0];
+
+      for( var w = 0; w < words.length; w++ ) {
+        var tryLine = safeLine + (safeLine.length > 0 ? ' ' : '') + words[ w ];
+        var metrics = context.measureText( tryLine );
+        var widthExceeded = metrics.width > maxWidth;
+        if( !widthExceeded ) {
+          safeLine = tryLine;
+          if( w < words.length - 1 ) continue;
+        }
+        _paintLine( safeLine, false );
+        safeLine = widthExceeded ? words[w] : '';
+      }
+
+      if( hardIdx === lines.length - 1 )
+        _paintLine( safeLine, true );
+
+    }, { });
+
+    function _paintLine( txtLine, force ) {
+      context.fillText( txtLine, pos[0], pos[1] );
+      opts.lineEmitted && opts.lineEmitted( txtLine, lineIdx );
+      if( ((lineIdx % opts.chunkSize) === (opts.chunkSize - 1)) || force ) {
+        opts.pageEmitted && (context = opts.pageEmitted( context ));
+        pos[0] = pos[1] = padding;
+      }
+      pos[1] += lineHeight;
+      ++lineIdx;
+    }
+
+    return {
+      numLines: lineIdx
+    };
+  };
+
+  my._renderhtml = function ( context, text, measureOnly, opts ) {
+
+  };
+
+  my._renderdom = function ( context, text, measureOnly, opts ) {
+
+  };
+
+  return my;
+
+}));
+
+/**
 Utilities for Extrovert.js.
 @module utils.js
 @license Copyright (c) 2015 | James M. Devlin
 */
 
-define('extrovert/utilities/utils',['require', 'three', './cookie', './getComputedStyle'],
-function( require, THREE, cookie, getComputedStyle )  {
+define('extrovert/utilities/utils',['require', 'three', './cookie', './getComputedStyle', './detect',  'in.scribe'],
+function( require, THREE, cookie, getComputedStyle, detect, inscribe )  {
 
   var events;
   'use strict';
@@ -734,6 +890,9 @@ function( require, THREE, cookie, getComputedStyle )  {
     setCookie: cookie.setCookie,
     clearCookie: cookie.clearCookie,
     getComputedStyle: getComputedStyle,
+    wrapText: (new inscribe()).wrapText,
+    detectWebGL: detect.supportsWebGL,
+    detectCanvas: detect.supportsCanvas,
     // https://developer.mozilla.org/en-US/docs/Web/Guide/Events/Creating_and_triggering_events
     registerEvent: function( eventName ) {
       var classic = true; // older IE-compat method
@@ -822,62 +981,6 @@ define( 'extrovert/utilities/offset',[],function() {
   };
 });
 
-/**
-WebGL and Canvas detection routines.
-@module core.js
-@license Copyright (c) 2015 | James M. Devlin
-*/
-
-define('extrovert/utilities/detect',[],function() {
-
-  return {
-
-    /**
-    Figure out if the browser supports WebGL.
-    @method detectWebGL
-    */
-    supportsWebGL: function( return_context ) {
-      if( !!window.WebGLRenderingContext ) {
-        var canvas = document.createElement("canvas");
-        var names = ["webgl", "experimental-webgl", "moz-webgl", "webkit-3d"];
-        var context = false;
-        for(var i=0;i<4;i++) {
-          try {
-            context = canvas.getContext(names[i]);
-            if (context && typeof context.getParameter == "function") {
-              // WebGL is enabled
-              if (return_context) {
-                // return WebGL object if the function's argument is present
-                return {name:names[i], gl:context};
-              }
-              // else, return just true
-              return true;
-            }
-          } catch(e) {
-          }
-        }
-
-        // WebGL is supported, but disabled
-        return false;
-      }
-
-      // WebGL not supported
-      return false;
-    },
-
-    /**
-    Figure out if the browser supports Canvas.
-    http://stackoverflow.com/q/2745432
-    @method detectVCanvas
-    */
-    supportsCanvas: function() {
-      var elem = document.createElement('canvas');
-      return !!(elem.getContext && elem.getContext('2d'));
-    }
-
-  };
-
-});
 /**
 THREE.js subsystem provider for Extrovert.js.
 @module provider-three.js
@@ -1140,102 +1243,6 @@ define('extrovert/utilities/blend',[],function() {
 });
 
 /**
-Rasterize formatted text, markup, and HTML content.
-@version 0.1.0
-@file in.scribe.js
-@author James Devlin (james@indevious.com)
-@license MIT
-*/
-
-( function( window, factory ) {
-
-  // UMD trickery - https://github.com/umdjs/umd
-  'use strict';
-  if ( typeof define === 'function' && define.amd ) {
-    define( 'in.scribe',[], factory ); // AMD
-  } else if ( typeof exports === 'object' ) {
-    module.exports = factory( ); // CommonJS
-  } else {
-    window.inscribe = factory( ); // browser global
-  }
-
-}( window, function factory( ) {
-
-  'use strict';
-
-  var my = function( ) {
-
-    return {
-      inscribe: function( text, ctype, ctx, opts ) {
-        my[ '_render' + (ctype || 'text') ].call( this, ctx, text, opts );
-      }
-    };
-
-  };
-
-  my._rendertext = function( context, text, opts ) {
-
-    // Lift vars and apply defaults
-    var padding = opts.padding || 10
-    , maxWidth = opts.maxWidth ? opts.maxWidth - (2 * padding) : 492
-    , lineHeight = opts.lineHeight || 16
-    , pos = [padding, padding + lineHeight]
-    , measureOnly = false // future
-    , lines = text.split('\n')
-    , lineIdx = 0;
-    
-    // Process hard lines
-    lines.reduce(function( unused, line, hardIdx ) {
-
-      var words = line.split(' '), safeLine = '';
-      words[0] = (opts.firstLineIndent || '   ') + words[0];
-
-      for( var w = 0; w < words.length; w++ ) {
-        var tryLine = safeLine + (safeLine.length > 0 ? ' ' : '') + words[ w ];
-        var metrics = context.measureText( tryLine );
-        var widthExceeded = metrics.width > maxWidth;
-        if( !widthExceeded ) {
-          safeLine = tryLine;
-          if( w < words.length - 1 ) continue;
-        }
-        _paintLine( safeLine, false );
-        safeLine = widthExceeded ? words[w] : '';
-      }
-
-      if( hardIdx === lines.length - 1 )
-        _paintLine( safeLine, true );
-
-    }, { });
-
-    function _paintLine( txtLine, force ) {
-      context.fillText( txtLine, pos[0], pos[1] );
-      opts.lineEmitted && opts.lineEmitted( txtLine, lineIdx );
-      if( ((lineIdx % opts.chunkSize) === (opts.chunkSize - 1)) || force ) {
-        opts.pageEmitted && (context = opts.pageEmitted( context ));
-        pos[0] = pos[1] = padding;
-      }
-      pos[1] += lineHeight;
-      ++lineIdx;
-    }
-
-    return {
-      numLines: lineIdx
-    };
-  };
-
-  my._renderhtml = function ( context, text, measureOnly, opts ) {
-
-  };
-
-  my._renderdom = function ( context, text, measureOnly, opts ) {
-
-  };
-
-  return my;
-
-}));
-
-/**
 A simple Extrovert HTML rasterizer.
 @module paint-plain-text.js
 @license Copyright (c) 2015 | James M. Devlin
@@ -1286,7 +1293,7 @@ define('extrovert/rasterizers/paint-plain-text-stream',['extrovert/utilities/uti
       var textures = [];
       var wrapInfo = { };
       var lineHeight = opts.lineHeight || 16;
-      var massaged_content = val.text.replace('\n',' ');
+      var massaged_content = val.text;
       var padding = opts.padding || 10;
       info.numLines = 0;
       var canvas = document.createElement('canvas');
@@ -1331,19 +1338,19 @@ The built-in "book" generator for Extrovert.js.
 define('extrovert/generators/book',['require', '../core', '../utilities/log', 'extrovert/providers/three/provider-three'], function( require, extro, log, provider ) {
 
   'use strict';
-  
+
   var _opts = null;
   var _eng = null;
   var _side = null;
   var _noun = null;
 
-  function mapTextures( cubeGeo ) {
+  function mapTextures( cubeGeo, width, height ) {
     for (var i = 0; i < cubeGeo.faces.length ; i++) {
       var fvu = cubeGeo.faceVertexUvs[0][i];
       if( Math.abs( cubeGeo.faces[ i ].normal.z ) > 0.9) {
         for( var fv = 0; fv < 3; fv++ ) {
           if( Math.abs( fvu[fv].y ) < 0.01 ) {
-            fvu[ fv ].y = 0.37;
+            fvu[ fv ].y = 1 - ( width / height );
           }
         }
       }
@@ -1352,8 +1359,8 @@ define('extrovert/generators/book',['require', '../core', '../utilities/log', 'e
   }
 
   var BookGenerator = function( ) {
-    
-    var extrovert = require('../core');   
+
+    var extrovert = require('../core');
     var utils = require('../utilities/utils');
 
     return {
@@ -1401,20 +1408,18 @@ define('extrovert/generators/book',['require', '../core', '../utilities/log', 'e
               _eng.rasterizers[ noun.rasterizer ] : noun.rasterizer;
           } else {
             rast = _eng.rasterizers.paint_plain_text_stream;
-            //rast = extrovert.getRasterizer( obj );
           }
 
           if( _opts.pagify ) {
             var done = false,
               info = { },
               rastOpts = {
-                width: _opts.texWidth || 512, // Force power-of-2 textures
+                width: _opts.texWidth || 512, // Default to power-of-2 textures
                 height: _opts.texHeight || 1024,
                 bkColor: _opts.pageColor || (_opts.material && _opts.material.color) || 0xFFFFFF,
                 textColor: _opts.textColor || 0x232323
               },
               textures = rast.paint(obj, rastOpts, info );
-              //matArray = [ _side, _side, _side, _side, null, null ];
 
             var mats = textures.map( _createMat );
             var front = mats.filter( _isEven );
@@ -1425,7 +1430,7 @@ define('extrovert/generators/book',['require', '../core', '../utilities/log', 'e
               var matArray = [ _side, _side, _side, _side, front[ tt ], tt < back.length ? back[ tt ] : _side ];
               var meshMat = provider.createCubeMaterial( matArray );
               var mesh = extrovert.createObject({ type: 'box', pos: tilePos, dims: _opts.dims, mat: meshMat, mass: 1000 });
-              mapTextures( mesh.geometry );
+              mapTextures( mesh.geometry, rastOpts.width, rastOpts.height );
               extrovert.LOGGING && log.msg('Generating page %o at position %f, %f, %f', mesh, tilePos[0], tilePos[1], tilePos[2]);
             }
           }
@@ -1434,7 +1439,7 @@ define('extrovert/generators/book',['require', '../core', '../utilities/log', 'e
 
     };
   };
-  
+
   return BookGenerator;
 });
 
@@ -1652,19 +1657,43 @@ function( require, extro, provider )
         extrovert.createPlacementPlane( [ 0,0,0 ] );
       },
 
+      /**
+      Generate 3D objects from a collection of HTML elements.
+      @param elems An array of HTML elements such as <img> elements.
+      */
       generate: function( noun, elems ) {
         _noun = noun;
-        for( var i = 0; i < elems.length; i++ ) {
-          var obj = elems[ i ];
-          var pos_info = this.transform( obj );
+
+        // If "align: content-bottom" is specified, then the bottom edge of
+        // the bottommost HTML element (going down the screen) is interpreted
+        // as Y = 0.
+        var floor = null;
+        if( _noun.align == 'content-bottom' ) {
+          floor = 0.0;
+          for( var i = 0; i < elems.length; i++ ) {
+            var ob = $(elems[i]);
+            var el_floor = ob.offset().top + ob.height();
+            if( el_floor > floor )
+              floor = el_floor;
+          }
+          console.log('Floor is ' + floor);
+        }
+
+        for( var j = 0; j < elems.length; j++ ) {
+          var obj = elems[ j ];
+          var pos_info = this.transform( obj, floor );
           var mat_info = this.rasterize( obj );
           extrovert.createObject({ type: 'box', pos: pos_info.pos, dims: [pos_info.width, pos_info.height, pos_info.depth], mat: mat_info, mass: 1000 });
         }
       },
 
-      transform: function( obj ) {
+      /**
+      Transform an entity's 2D HTML location (within its containing element)
+      to 3D world coordinates.
+      */
+      transform: function( obj, floor ) {
         var cont = _noun.container || (_eng.opts.src && _eng.opts.src.container) || document.body;
-        return extrovert.getPosition( obj, cont, _opts.depth );
+        return extrovert.getPosition( obj, cont, _opts.depth, floor );
       },
 
       rasterize: function( obj ) {
@@ -2136,6 +2165,7 @@ function
         cont.querySelectorAll( src ) : src;
 
       var gen = initGenerator( trans );
+
       gen.generate( trans, elems );
 
     }, { });
@@ -2331,7 +2361,8 @@ function
   }
 
   my.screenToWorld = function( posX, posY, placement_plane, extents ) {
-    eng.raycaster.setFromCamera( my.toNDC( posX, posY, 0.5, new THREE.Vector2(), extents ), eng.camera );
+    var ndc = my.toNDC( posX, posY, 0.5, new THREE.Vector2(), extents );
+    eng.raycaster.setFromCamera( ndc, eng.camera );
     var p = placement_plane || eng.placement_plane;
     var intersects = eng.raycaster.intersectObject( p );
     return (intersects.length > 0) ? intersects[0].point : null;
@@ -2471,7 +2502,7 @@ function
     eng.controls && eng.controls.enabled && eng.controls.mousewheel( e );
   }
 
-  my.getPosition = function( val, container, zDepth ) {
+  my.getPosition = function( val, container, zDepth, floor ) {
 
     // Safely get the position of the HTML element [1] relative to its parent
     var src_cont = (typeof container === 'string') ?
@@ -2482,9 +2513,22 @@ function
     var pos = { left: child_pos.left - parent_pos.left, top: child_pos.top - parent_pos.top };
 
     // Get the position of the element's left-top and right-bottom corners in
-    // WORLD coords, based on where the camera is.
-    var topLeft = my.screenToWorld( pos.left, pos.top, eng.placement_plane );
-    var botRight = my.screenToWorld( pos.left + val.offsetWidth, pos.top + val.offsetHeight, eng.placement_plane );
+    // WORLD coords.
+
+    var topLeft, botRight;
+    if( !floor ) {
+      topLeft = { x: pos.left, y: pos.top + val.offsetHeight, z: 0.5 };
+      botRight = { x: topLeft.x + val.offsetWidth, y: pos.top, z: 0.5 };
+    }
+    else
+    {
+      topLeft = { x: pos.left, y: floor - pos.top, z: 0.5 };
+      botRight = {
+        x: topLeft.x + val.offsetWidth,
+        y: floor - (pos.top - val.offsetHeight), z: 0.5
+      };
+    }
+
     // Calculate dimensions of the element (in world units)
     var block_width = Math.abs( botRight.x - topLeft.x );
     var block_height = Math.abs( topLeft.y - botRight.y );

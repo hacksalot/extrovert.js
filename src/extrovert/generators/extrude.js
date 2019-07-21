@@ -36,19 +36,42 @@ function( require, extro, provider )
         extrovert.createPlacementPlane( [ 0,0,0 ] );
       },
 
+      /**
+      Generate 3D objects from a collection of HTML elements.
+      @param elems An array of HTML elements such as <img> elements.
+      */
       generate: function( noun, elems ) {
         _noun = noun;
-        for( var i = 0; i < elems.length; i++ ) {
-          var obj = elems[ i ];
-          var pos_info = this.transform( obj );
+
+        // If "align: content-bottom" is specified, then the bottom edge of
+        // the bottommost HTML element (going down the screen) is interpreted
+        // as Y = 0.
+        var floor = null;
+        if( _noun.align == 'content-bottom' ) {
+          floor = 0.0;
+          for( var i = 0; i < elems.length; i++ ) {
+            var ob = $(elems[i]);
+            var el_floor = ob.offset().top + ob.height();
+            if( el_floor > floor )
+              floor = el_floor;
+          }
+        }
+
+        for( var j = 0; j < elems.length; j++ ) {
+          var obj = elems[ j ];
+          var pos_info = this.transform( obj, floor );
           var mat_info = this.rasterize( obj );
           extrovert.createObject({ type: 'box', pos: pos_info.pos, dims: [pos_info.width, pos_info.height, pos_info.depth], mat: mat_info, mass: 1000 });
         }
       },
 
-      transform: function( obj ) {
+      /**
+      Transform an entity's 2D HTML location (within its containing element)
+      to 3D world coordinates.
+      */
+      transform: function( obj, floor ) {
         var cont = _noun.container || (_eng.opts.src && _eng.opts.src.container) || document.body;
-        return extrovert.getPosition( obj, cont, _opts.depth );
+        return extrovert.getPosition( obj, cont, _opts.depth, floor );
       },
 
       rasterize: function( obj ) {

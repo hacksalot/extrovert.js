@@ -244,6 +244,7 @@ function
         cont.querySelectorAll( src ) : src;
 
       var gen = initGenerator( trans );
+
       gen.generate( trans, elems );
 
     }, { });
@@ -439,7 +440,8 @@ function
   }
 
   my.screenToWorld = function( posX, posY, placement_plane, extents ) {
-    eng.raycaster.setFromCamera( my.toNDC( posX, posY, 0.5, new THREE.Vector2(), extents ), eng.camera );
+    var ndc = my.toNDC( posX, posY, 0.5, new THREE.Vector2(), extents );
+    eng.raycaster.setFromCamera( ndc, eng.camera );
     var p = placement_plane || eng.placement_plane;
     var intersects = eng.raycaster.intersectObject( p );
     return (intersects.length > 0) ? intersects[0].point : null;
@@ -579,7 +581,7 @@ function
     eng.controls && eng.controls.enabled && eng.controls.mousewheel( e );
   }
 
-  my.getPosition = function( val, container, zDepth ) {
+  my.getPosition = function( val, container, zDepth, floor ) {
 
     // Safely get the position of the HTML element [1] relative to its parent
     var src_cont = (typeof container === 'string') ?
@@ -590,9 +592,22 @@ function
     var pos = { left: child_pos.left - parent_pos.left, top: child_pos.top - parent_pos.top };
 
     // Get the position of the element's left-top and right-bottom corners in
-    // WORLD coords, based on where the camera is.
-    var topLeft = my.screenToWorld( pos.left, pos.top, eng.placement_plane );
-    var botRight = my.screenToWorld( pos.left + val.offsetWidth, pos.top + val.offsetHeight, eng.placement_plane );
+    // WORLD coords.
+
+    var topLeft, botRight;
+    if( !floor ) {
+      topLeft = { x: pos.left, y: pos.top + val.offsetHeight, z: 0.5 };
+      botRight = { x: topLeft.x + val.offsetWidth, y: pos.top, z: 0.5 };
+    }
+    else
+    {
+      topLeft = { x: pos.left, y: floor - pos.top, z: 0.5 };
+      botRight = {
+        x: topLeft.x + val.offsetWidth,
+        y: floor - (pos.top - val.offsetHeight), z: 0.5
+      };
+    }
+
     // Calculate dimensions of the element (in world units)
     var block_width = Math.abs( botRight.x - topLeft.x );
     var block_height = Math.abs( topLeft.y - botRight.y );

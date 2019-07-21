@@ -41,6 +41,6 @@
   "license": "MIT",
   "homepage": "http://extrovert3d.com",
   "resolutions": {
-    "threejs": "5c7e0df9b1"
+    "threejs": "159a40648e"
   }
 }
