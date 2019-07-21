@@ -3,7 +3,7 @@
 * Extrovert.js 0.1.0
 * ----------------------------------------------------------------------------
 * @license Copyright (c) 2015 James M. Devlin | All Rights Reserved.
-* See: http://extrovert3d.com/license for details.
+* See: https://extrovert3d.com/license for details.
 *
 *
 * Extrovert.js incorporates the following libraries:
@@ -820,7 +820,7 @@ Rasterize formatted text, markup, and HTML content.
     , measureOnly = false // future
     , lines = text.split('\n')
     , lineIdx = 0;
-    
+
     // Process hard lines
     lines.reduce(function( unused, line, hardIdx ) {
 
@@ -1153,7 +1153,7 @@ define('extrovert/providers/three/provider-three',['extrovert/options/options', 
 
     return lights;
   };
-  
+
   /**
   Create a spotlight with the specified color. TODO: adjust shadowmap settings.
   @method createSpotlight
@@ -1165,7 +1165,7 @@ define('extrovert/providers/three/provider-three',['extrovert/options/options', 
     var spotLight = new THREE.SpotLight( light.color );
     spotLight.shadowCameraVisible = false;
     return spotLight;
-  }  
+  }
 
   /**
   Module return.
@@ -2662,7 +2662,7 @@ define('extrovert',['require','extrovert/options/version','extrovert/core','extr
     define('three', function () {
         return THREE;
     });
-    
+
     define('physijs', function() {
       return Physijs;
     });

@@ -1,8 +1,8 @@
-# License for Extrovert.js 0.1.0 #
+# License for Extrovert.js #
 
 The MIT License (MIT)
 
-Extrovert.js 0.x.0 | Copyright © 2015 James M. Devlin
+Extrovert.js | Copyright © 2015-19 James M. Devlin
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
