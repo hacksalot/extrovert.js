@@ -17,21 +17,49 @@ module.exports = function(grunt) {
     },
 
     requirejs: {
-      main: {
+      // In this configuration, embed Three.js / Physijs into the output
+      full: {
         options: {
           out: 'dist/extrovert.js',
           baseUrl: 'src',
           paths: {
             'extrovert': './extrovert',
-            'three': '../bower_components/threejs/build/three<%= ext %>',
-            'physijs': '../bower_components/physijs/physi',
-            'in.scribe': '../bower_components/in.scribe/in.scribe'
+            'three': '../node_modules/three/build/three',
+            'physijs': '../node_modules/physijs/physi',
+            'in.scribe': '../node_modules/in.scribe/in.scribe',
+            'three-glue': './three-glue'
+          },//,
+          shim: {
+          // Do not include Three.js in the shim anymore. See:
+          // https://stackoverflow.com/a/30361895
+          // 'three': { exports: 'THREE' }
+            'physijs': { exports: 'Physijs' }
+          },
+          include: [ '../node_modules/almond/almond', 'extrovert' ],
+          wrap: {
+            startFile: 'src/extrovert/fragments/start.frag',
+            endFile: 'src/extrovert/fragments/end.frag'
+          },
+          preserveLicenseComments: false,
+          optimize: 'none'
+        }
+      },
+      // In this configuration, exclude Three.js / Physijs from the output
+      light: {
+        options: {
+          out: 'dist/extrovert.js',
+          baseUrl: 'src',
+          paths: {
+            'extrovert': './extrovert',
+            'three': '../node_modules/three/build/three',
+            'physijs': '../node_modules/physijs/physi',
+            'in.scribe': '../node_modules/in.scribe/in.scribe'
           },
           shim: {
             'three': { exports: 'THREE' },
             'physijs': { exports: 'Physijs' }
           },
-          include: ['../bower_components/almond/almond', 'extrovert'],
+          include: ['../node_modules/almond/almond', 'extrovert' ],
           exclude: ['three', 'physijs'],
           wrap: {
             startFile: 'src/extrovert/fragments/start.frag',
@@ -76,9 +104,9 @@ module.exports = function(grunt) {
       thirdparty: {
         files: [{
           expand: true, flatten: true,
-          src: ['bower_components/threejs/build/three.js',
-                'bower_components/physijs/physi.js',
-                'bower_components/ammo.js/builds/ammo.js'],
+          src: ['node_modules/three/build/three.js',
+                'node_modules/physijs/physi.js',
+                'node_modules/ammo.js/ammo.js'],
           dest: '.tmp'
         }]
       },
@@ -86,7 +114,7 @@ module.exports = function(grunt) {
         files: [{
           expand: true,
           flatten: true,
-          src: ['bower_components/physijs/physijs_worker.js', 'bower_components/ammo.js/builds/ammo.js'],
+          src: ['node_modules/physijs/physijs_worker.js', 'node_modules/ammo.js/ammo.js'],
           dest: 'dist'
         }]
       }
@@ -121,7 +149,7 @@ module.exports = function(grunt) {
 
   };
 
-  var cmn = ['clean', 'jshint', 'copy:thirdparty', 'requirejs', 'concat', 'copy:physijs'];
+  var cmn = ['clean', 'jshint', 'copy:thirdparty', 'requirejs:full', 'concat', 'copy:physijs'];
   var cfgs = {
     debug: [],
     release: ['uglify:dist'],
