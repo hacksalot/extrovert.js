@@ -23,7 +23,7 @@
     "almond": "~0.3.1",
     "ammo.js": "0.0.10",
     "in.scribe": "github:hacksalot/in.scribe",
-    "physijs": "github:hacksalot/physijs",
+    "physijs": "github:hacksalot/physijs#semver:^0.2.0",
     "three": "^0.106.2"
   },
   "devDependencies": {

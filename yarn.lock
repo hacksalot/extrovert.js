@@ -1525,9 +1525,12 @@ performance-now@^2.1.0:
   resolved "https://registry.yarnpkg.com/performance-now/-/performance-now-2.1.0.tgz#6309f4e0e5fa913ec1c69307ae364b4b377c9e7b"
   integrity sha1-Ywn04OX6kT7BxpMHrjZLSzd8nns=
 
-"physijs@github:hacksalot/physijs":
-  version "1.0.0"
-  resolved "https://codeload.github.com/hacksalot/physijs/tar.gz/ad7f704e56b133a99228494ab85ba5145a5ca158"
+"physijs@github:hacksalot/physijs#semver:^0.2.0":
+  version "0.2.0"
+  resolved "https://codeload.github.com/hacksalot/physijs/tar.gz/30072b2b7c00e6101aa83a506b0c212656e2c3e0"
+  dependencies:
+    ammo.js "0.0.10"
+    three "^0.106.2"
 
 pify@^2.0.0:
   version "2.3.0"
