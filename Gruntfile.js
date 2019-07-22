@@ -18,9 +18,9 @@ module.exports = function(grunt) {
 
     requirejs: {
       // In this configuration, embed Three.js / Physijs into the output
-      full: {
+      bundled: {
         options: {
-          out: 'dist/extrovert.js',
+          out: 'dist/extrovert-bundled.js',
           baseUrl: 'src',
           paths: {
             'extrovert': './extrovert',
@@ -45,7 +45,7 @@ module.exports = function(grunt) {
         }
       },
       // In this configuration, exclude Three.js / Physijs from the output
-      light: {
+      main: {
         options: {
           out: 'dist/extrovert.js',
           baseUrl: 'src',
@@ -75,6 +75,10 @@ module.exports = function(grunt) {
       main: {
         src: [ 'src/extrovert/fragments/license.frag', 'dist/extrovert.js' ],
         dest: 'dist/extrovert.js'
+      },
+      bundled: {
+        src: [ 'src/extrovert/fragments/license.frag', 'dist/extrovert-bundled.js' ],
+        dest: 'dist/extrovert-bundled.js'
       }
     },
 
@@ -101,20 +105,29 @@ module.exports = function(grunt) {
 
     copy: {
       // Copy 3rd-party JS to a temp folder prior to Require.js processing
-      thirdparty: {
-        files: [{
-          expand: true, flatten: true,
-          src: ['node_modules/three/build/three.js',
-                'node_modules/physijs/physi.js',
-                'node_modules/ammo.js/ammo.js'],
-          dest: '.tmp'
-        }]
-      },
-      physijs: {
+      // thirdparty: {
+      //   files: [{
+      //     expand: true, flatten: true,
+      //     src: ['node_modules/three/build/three.js',
+      //           'node_modules/physijs/physi.js',
+      //           'node_modules/ammo.js/ammo.js'],
+      //     dest: '.tmp'
+      //   }]
+      // },
+      all: {
         files: [{
           expand: true,
           flatten: true,
-          src: ['node_modules/physijs/physijs_worker.js', 'node_modules/ammo.js/ammo.js'],
+          src: ['node_modules/physijs/physijs_worker.js',
+                'node_modules/ammo.js/ammo.js'],
+          dest: 'dist'
+        }]
+      },
+      main: {
+        files: [{
+          expand: true,
+          flatten: true,
+          src: ['node_modules/physijs/physi.js'],
           dest: 'dist'
         }]
       }
@@ -124,9 +137,16 @@ module.exports = function(grunt) {
       options: {
         banner: '/*! <%= pkg.name %> <%= grunt.template.today("dd-mm-yyyy") %> */\n'
       },
-      dist: {
+      main: {
         files: {
           'dist/extrovert.min.js': ['dist/extrovert.js'],
+          'dist/physijs_worker.min.js': ['dist/physijs_worker.js'],
+          'dist/physi.min.js': ['dist/physi.js']
+        }
+      },
+      bundled: {
+        files: {
+          'dist/extrovert-bundled.min.js': ['dist/extrovert-bundled.js'],
           'dist/physijs_worker.min.js': ['dist/physijs_worker.js']
         }
       }
@@ -149,10 +169,12 @@ module.exports = function(grunt) {
 
   };
 
-  var cmn = ['clean', 'jshint', 'copy:thirdparty', 'requirejs:full', 'concat', 'copy:physijs'];
+  var cmnCore = ['clean', 'jshint', 'requirejs:main', 'concat:main', 'copy:all', 'copy:main'];
+  var cmnBundled = ['clean', 'jshint', 'requirejs:bundled', 'concat:bundled', 'copy:all'];
+
   var cfgs = {
     debug: [],
-    release: ['uglify:dist'],
+    release: [grunt.option('bundled') ? 'uglify:bundled' : 'uglify:main'],
     test: ['default', 'connect:auto'],
     testmanual: ['default', 'connect:manual']
   };
@@ -168,7 +190,7 @@ module.exports = function(grunt) {
 
   grunt.registerTask( 'build', 'Build the Extrovert library.', function( config, quick ) {
     config = config || 'release';
-    grunt.task.run( cmn );
+    grunt.task.run( grunt.option('bundled') ? cmnBundled : cmnCore );
     grunt.task.run( cfgs[config] );
   });
 
@@ -178,5 +200,4 @@ module.exports = function(grunt) {
 
   grunt.registerTask( 'test', cfgs.test );
   grunt.registerTask( 'testmanual', cfgs.textmanual );
-
 };

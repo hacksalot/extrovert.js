@@ -3,7 +3,7 @@
   "version": "0.3.0",
   "author": "James Devlin <hacksalot@indevious.com> (https://deskchained.com)",
   "description": "3Dify your websites, blogs, RSS feeds, and image galleries.",
-  "main": "Gruntfile.js",
+  "main": "dist/extrovert.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/hacksalot/extrovert.js.git"
