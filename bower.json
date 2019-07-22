@@ -12,12 +12,6 @@
   "main": [
     "dist/extrovert.js"
   ],
-  "dependencies": {
-    "threejs": "*",
-    "physijs": "*",
-    "in.scribe": "~0.1.0",
-    "almond": "~0.3.1"
-  },
   "ignore": [
     "bower_components/",
     "node_modules/",
@@ -40,7 +34,4 @@
   ],
   "license": "MIT",
   "homepage": "https://github.com/hacksalot/extrovert.js",
-  "resolutions": {
-    "threejs": "159a40648e"
-  }
 }
