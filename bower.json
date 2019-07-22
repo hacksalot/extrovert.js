@@ -2,12 +2,12 @@
   "name": "extrovert.js",
   "version": "0.2.0",
   "authors": [
-    "hacksalot <hacksalot@indevious.com> (https://indevious.com)"
+    "James Devlin <hacksalot@indevious.com> (https://deskchained.com)"
   ],
   "description": "3Dify your websites, blogs, RSS feeds, and image galleries.",
   "repository": {
     "type": "git",
-    "url": "git://github.com/hacksalot/extrovert.js.git"
+    "url": "https://github.com/hacksalot/extrovert.js"
   },
   "main": [
     "dist/extrovert.js"
@@ -33,5 +33,5 @@
     "physijs"
   ],
   "license": "MIT",
-  "homepage": "https://github.com/hacksalot/extrovert.js",
+  "homepage": "https://github.com/hacksalot/extrovert.js"
 }
