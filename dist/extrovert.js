@@ -1132,13 +1132,16 @@ define('extrovert/providers/three/provider-three',['extrovert/options/options', 
     for( var idx = 0; idx < light_opts.length; idx++ ) {
       var val = light_opts[ idx ];
       if( val.type === 'ambient' )
-        new_light = new THREE.AmbientLight( val.color );
+        new_light = new THREE.AmbientLight( val.color, val.intensity );
       else if (val.type === 'point')
         new_light = new THREE.PointLight( val.color, val.intensity, val.distance );
       else if (val.type === 'spotlight')
         new_light = createSpotlight( val );
       else if (val.type === 'hemisphere')
         new_light = new THREE.HemisphereLight( val.color, val.groundColor, val.intensity );
+      else if (val.type === 'directional') {
+        new_light = new THREE.DirectionalLight( val.color, val.intensity );
+      }
       else
         return;
 
