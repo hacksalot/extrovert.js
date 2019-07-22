@@ -1,6 +1,6 @@
 {
   "name": "extrovert.js",
-  "version": "0.1.3",
+  "version": "0.2.0",
   "author": "hacksalot <hacksalot@indevious.com> (https://indevious.com)",
   "description": "3Dify your websites, blogs, RSS feeds, and image galleries.",
   "main": "Gruntfile.js",
