@@ -1,6 +1,6 @@
 {
   "name": "extrovert.js",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "author": "James Devlin <hacksalot@indevious.com> (https://deskchained.com)",
   "description": "3Dify your websites, blogs, RSS feeds, and image galleries.",
   "main": "Gruntfile.js",
