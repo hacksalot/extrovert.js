@@ -24,7 +24,7 @@
     "ammo.js": "0.0.10",
     "in.scribe": "github:hacksalot/in.scribe",
     "physijs": "github:hacksalot/physijs#semver:^0.2.0",
-    "three": "^0.106.2"
+    "three": "^0.137.0"
   },
   "devDependencies": {
     "grunt": "^1.0.4",
